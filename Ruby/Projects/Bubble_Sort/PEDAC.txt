@@ -1,0 +1,26 @@
+
+Bubble Sort:
+
+
+Inputs: an array of elements
+Output: a sorted array
+
+Explicit Requirements:
+-Cannot use sort method
+-Must use bubble sort algorithm where each element is compared to the following element and swapped places if the following element is less than the current one.
+
+Implicit Requirements:
+-Should be able to sort letters, not just numbers.
+-If names or words, sort in alphabetic order.
+
+Algorithm:  
+
+Start with a toggle as a false value, showing that the array is not sorted. 
+
+Iterate through an array and compare the current element with the next element. If next element is smaller than current, then swap them and change toggle value to true, if not, then move to the next element and repeat.
+
+Continue iterating until the toggle remains false on a full iteration of the array.
+
+Return the sorted array.
+
+
