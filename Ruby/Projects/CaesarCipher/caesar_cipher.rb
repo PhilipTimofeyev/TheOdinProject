@@ -7,5 +7,3 @@ def caesar_cipher(str, shift = 0)
     char.match?(/[A-Z]/) ? new_letter.upcase : new_letter
   end
 end
-
-puts "ol"
