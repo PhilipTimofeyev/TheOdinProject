@@ -1,0 +1,24 @@
+
+Stockpicker:
+
+
+Inputs: an array of integers
+Output: an array of two integers representing indexes 
+
+Implicit requirements:
+Return a pair of days representing best day to buy and best day to sell
+Day to buy is first index, day to sell is second
+Days start at 0
+Need to buy before sell. So cannot buy on 5th day and sell on 3rd day.
+
+Algorithm:
+
+Do an iteration on top of an iteration by iterating the first element, then subtracting every element after the first while recording both indexes.
+
+Add these values to an array with three elements: index of first day, index of second day, and value of the difference.
+
+Find the max difference value of the array and return the first and second index.
+
+If there is more than one buy/sell pair that give the same difference, include in the result.
+
+Raise error if only one day of stocks.
