@@ -1,0 +1,18 @@
+
+Substring:
+
+
+Inputs: a string, an array of strings
+Output: Hash of substrings as key and how many times substring is found as integer.
+
+Implicit requirements:
+Each substring in hash is case insensitive
+Method must handle multiple words in first argument
+If part of the word from the dictionary is in a word in the first argument, it counts. ie. "how" >> "how's"
+
+Algorithm:
+
+Split the words in the first argument
+Iterate over the dictionary array, checking if a word is in the first argument words.
+If a word exists, add the word to a hash and raise count by one.
+Return hash.
