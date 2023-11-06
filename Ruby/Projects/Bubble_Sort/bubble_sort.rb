@@ -13,3 +13,5 @@ def bubble_sort(arr)
     sorted = true
   end
 end
+
+p "lol"
