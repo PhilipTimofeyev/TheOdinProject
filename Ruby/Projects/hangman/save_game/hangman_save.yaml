@@ -1,0 +1,14 @@
+---
+:board: &1 !ruby/object:Board
+  board:
+  word: invest
+  guesses:
+  - a
+  - e
+  - i
+  - t
+  - s
+  word_guesses: []
+  mistakes: 1
+:player: !ruby/object:Player
+  board: *1
