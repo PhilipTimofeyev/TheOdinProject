@@ -55,56 +55,47 @@ class Tree
   end
 
   def delete(value, node = root)
-    return nil if node.nil?
-    # 
-    if value == node.value
-          succeeding_node = next_succeeding(node.right)
-          delete(succeeding_node.value)
-          succeeding_node.right = node.right
-          succeeding_node.left = node.left
-          node = succeeding_node
-          self.root = node
+    if node.nil?
+      return nil
     elsif value < node.value
-      if node.left.value == value
-        if node.left.left.nil? && node.left.right.nil?
-          node.left = nil
-        elsif node.left.right.nil?
-          node.left = node.left.left
-        elsif node.left.left.nil?
-          node.left = node.left.right
-        else
-          succeeding_node = next_succeeding(node.left.right)
-          delete(succeeding_node.value)
-          succeeding_node.left = node.left.left
-          succeeding_node.right = node.left.right
-          node.left = succeeding_node
-        end
-      else 
-        delete(value, node.left)
-      end
-    elsif value > node.value
-      if node.right.value == value
-        if node.right.right.nil? && node.right.left.nil?
-          node.right = nil
-        elsif node.right.left.nil?
-          node.right = node.right.right
-        elsif node.right.right.nil?
-          node.left = node.right.left
-        else
-          succeeding_node = next_succeeding(node.right.right)
-          delete(succeeding_node.value)
-          succeeding_node.left = node.right.left
-          succeeding_node.right = node.right.right
-          node.right = succeeding_node
-        end
-      else 
-        delete(value, node.right)
+      node.left = delete(value, node.left)
+      return node
+    elsif  value > node.value
+      node.right = delete(value, node.right)
+      return node
+    elsif value == node.value
+      if node.left.nil?
+        return node.right
+      elsif node.right.nil?
+        return node.left
+      else
+        node.right = lift(node.right, node)
+        return node
       end
     end
   end
 
-  def next_succeeding(node)
-    node.left.nil? ? node : next_succeeding(node.left)
+  def lift(node, node_to_delete)
+    if node.left
+      node.left = lift(node.left, node_to_delete)
+      return node
+    else
+      node_to_delete.value = node.value
+      return node.right
+    end
+  end
+
+  def find(value, node = nil)
+
+    return nil if node.nil?
+
+    if value < node.value
+      find(value, node.left)
+    elsif value > node.value
+      find(value, node.right)
+    elsif node.value == value
+      return node
+    end
   end
 
 
@@ -116,20 +107,18 @@ class Tree
 
 end
 
-# array = (1..24).to_a
-array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
+array = (1..10).to_a
+# array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 
 
 binary_tree = Tree.new(array)
 binary_tree.build_tree
 # binary_tree.pretty_print
 # binary_tree.insert(0)
-binary_tree.insert(21)
+# binary_tree.insert(21)
+puts ""
+puts ""
+puts ""
 binary_tree.pretty_print
-puts ""
-puts ""
-puts ""
 
-binary_tree.delete(8)
-binary_tree.pretty_print
 # p binary_tree.next_succeeding(binary_tree.root.right)
