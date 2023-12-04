@@ -98,6 +98,41 @@ class Tree
     end
   end
 
+  def level_order_iterative
+    return if root.nil?
+
+    queue = [root]
+    arr_of_values = []
+
+    until queue.empty?
+      current = queue.first
+      arr_of_values << current.value
+      yield current if block_given?
+      queue << current.left if current.left
+      queue << current.right if current.right
+      queue.shift
+    end
+
+    arr_of_values unless block_given?
+  end
+
+  def level_order_recursive(queue = [root], result = [], &block)
+    return if root.nil?
+
+    if queue.empty? && !block_given?
+      return result
+    elsif queue.empty?
+      return
+    end
+
+    current = queue.first
+    result << current.value
+    yield current if block_given?
+    queue.push(current.left) if current.left
+    queue.push(current.right) if current.right
+    queue.shift
+    level_order_recursive(queue, result, &block)
+  end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
@@ -113,12 +148,4 @@ array = (1..10).to_a
 
 binary_tree = Tree.new(array)
 binary_tree.build_tree
-# binary_tree.pretty_print
-# binary_tree.insert(0)
-# binary_tree.insert(21)
-puts ""
-puts ""
-puts ""
 binary_tree.pretty_print
-
-# p binary_tree.next_succeeding(binary_tree.root.right)
