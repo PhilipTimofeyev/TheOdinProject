@@ -134,6 +134,53 @@ class Tree
     level_order_recursive(queue, result, &block)
   end
 
+  def preorder(node = root, result = [], &block)
+    if node.nil? && !block_given?
+      return result
+    elsif node.nil?
+      return
+    end
+
+    yield node if block_given?
+    result << node.value
+
+    preorder(node.left, result, &block)
+    node
+    preorder(node.right, result, &block)
+
+  end
+
+  def postorder(node = root, result = [])
+    if node.nil? && !block_given?
+      return result
+    elsif node.nil?
+      return
+    end
+
+    postorder(node.left, result)
+    node
+    postorder(node.right, result)
+
+    yield node if block_given?
+    result << node.value
+
+  end
+
+  def inorder(node = root, result = [])
+    if node.nil? && !block_given?
+      return result
+    elsif node.nil?
+      return
+    end
+
+    inorder(node.left, result)
+    node
+    yield node if block_given?
+    result << node.value
+    inorder(node.right, result)
+
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.value}"
@@ -142,10 +189,13 @@ class Tree
 
 end
 
-array = (1..10).to_a
+array = (1..7).to_a
 # array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 
 
 binary_tree = Tree.new(array)
 binary_tree.build_tree
 binary_tree.pretty_print
+binary_tree.preorder
+binary_tree.postorder
+binary_tree.inorder
