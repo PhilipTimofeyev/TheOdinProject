@@ -85,7 +85,7 @@ class Tree
     end
   end
 
-  def find(value, node = nil)
+  def find(value, node = root)
 
     return nil if node.nil?
 
@@ -150,35 +150,75 @@ class Tree
 
   end
 
-  def postorder(node = root, result = [])
+  def postorder(node = root, result = [], &block)
     if node.nil? && !block_given?
       return result
     elsif node.nil?
       return
     end
 
-    postorder(node.left, result)
+    postorder(node.left, result, &block)
     node
-    postorder(node.right, result)
+    postorder(node.right, result, &block)
 
     yield node if block_given?
     result << node.value
 
   end
 
-  def inorder(node = root, result = [])
+  def inorder(node = root, result = [], &block)
     if node.nil? && !block_given?
       return result
     elsif node.nil?
       return
     end
 
-    inorder(node.left, result)
+    inorder(node.left, result, &block)
     node
     yield node if block_given?
     result << node.value
-    inorder(node.right, result)
+    inorder(node.right, result, &block)
 
+  end
+
+  def height(node = root)
+    return -1 if node.nil?
+
+    left = height(node.left)
+    right = height(node.right)
+
+    [left, right].max + 1
+
+  end
+
+  def depth(value, node = root, level = 0)
+    return if node.nil?
+
+    if value < node.value
+      depth(value, node.left, level + 1)
+    elsif value > node.value
+      depth(value, node.right, level + 1)
+    elsif node.value == value
+      return level
+    end
+  end
+
+  def balanced?(node = root)
+    return true if node.nil?
+
+    left_height = height(node.left)
+    right_height = height(node.right)
+
+    if ((left_height - right_height).abs <= 1) && balanced?(node.left) && balanced?(node.right)
+      return true
+    end
+
+    return false
+  end
+
+  def rebalance
+    self.arr = inorder(root)
+    build_tree(prepare_arr)
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
@@ -189,13 +229,20 @@ class Tree
 
 end
 
-array = (1..7).to_a
-# array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
-
-
-binary_tree = Tree.new(array)
+binary_tree = Tree.new((Array.new(15) { rand(1..100) }))
 binary_tree.build_tree
-binary_tree.pretty_print
-binary_tree.preorder
-binary_tree.postorder
-binary_tree.inorder
+
+p binary_tree.balanced?
+p binary_tree.preorder
+p binary_tree.postorder
+p binary_tree.inorder
+binary_tree.insert(124)
+binary_tree.insert(182)
+binary_tree.insert(243)
+binary_tree.insert(345)
+p binary_tree.balanced?
+binary_tree.rebalance
+p binary_tree.balanced?
+p binary_tree.preorder
+p binary_tree.postorder
+p binary_tree.inorder
