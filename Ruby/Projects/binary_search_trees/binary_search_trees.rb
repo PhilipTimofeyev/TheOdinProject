@@ -191,15 +191,14 @@ class Tree
 
   end
 
-  def depth(value, node = root, level = 0)
-    return if node.nil?
+  def depth(node, root_node = root)
+    return nil if node.nil?
+    return 0 if node == root_node
 
-    if value < node.value
-      depth(value, node.left, level + 1)
-    elsif value > node.value
-      depth(value, node.right, level + 1)
-    elsif node.value == value
-      return level
+    if node < root_node
+      depth(node, root_node.left) + 1
+    elsif node > root_node
+      depth(node, root_node.right) + 1
     end
   end
 
