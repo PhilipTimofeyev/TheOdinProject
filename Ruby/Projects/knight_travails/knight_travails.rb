@@ -74,12 +74,12 @@ class Chessboard
     coordinate.none? {|xy| xy < Chessboard::LOWER_BOUND || xy > Chessboard::UPPER_BOUND}
   end
 
-  def find_shortest_path(starting_coordinate, final_coordinate)
+  def build_predecessor_table(starting_coordinate, final_coordinate)
     starting_node = board[starting_coordinate]
     final_node = board[final_coordinate]
 
     queue = [starting_node]
-    previous_node_table = {}
+    predecessor_table = {}
 
     until queue.empty?
       current_node = queue.shift
@@ -87,17 +87,22 @@ class Chessboard
       validate_moves(knight.moveset(current_node)).each do |adjacent_square|
         unless adjacent_square.visited
           queue.push(adjacent_square)
-          previous_node_table[adjacent_square.coordinate] = current_node.coordinate
+          predecessor_table[adjacent_square.coordinate] = current_node.coordinate
         end
       end
     end
 
+    predecessor_table
+  end
+
+  def find_shortest_path(starting_coordinate, final_coordinate)
+    predecessor_table = build_predecessor_table(starting_coordinate, final_coordinate)
     shortest_path = []
-    current_node_coordinate = final_node.coordinate
+    current_node_coordinate = final_coordinate
 
     while current_node_coordinate != starting_coordinate
       shortest_path.prepend(current_node_coordinate)
-      current_node_coordinate = previous_node_table[current_node_coordinate]
+      current_node_coordinate = predecessor_table[current_node_coordinate]
     end
     shortest_path.prepend(starting_coordinate)
   end
@@ -113,11 +118,11 @@ class Chessboard
     Gem.win_platform? ? (system "cls") : (system "clear")
   end
 
-  def knight_moves(starting_coordinate, final_coordinate)
+  def knight_moves(starting_coordinate, ending_coordinate)
     board[starting_coordinate].draw_square = "S"
-    board[final_coordinate].draw_square = "E"
+    board[ending_coordinate].draw_square = "E"
 
-    path_arr = find_shortest_path(starting_coordinate, final_coordinate)
+    path_arr = find_shortest_path(starting_coordinate, ending_coordinate)
     draw_board
 
     path_arr.each_with_index do |step, idx|
@@ -126,12 +131,13 @@ class Chessboard
       draw_board
     end
 
-    puts "You made it in #{path_arr.size - 1} moves! Here's your path:" 
+    num_of_moves = path_arr.size - 1
+    puts "You made it in #{num_of_moves} #{num_of_moves < 2 ? 'move' : 'moves'}! Here's your path:" 
     path_arr.each {|coord| p coord }
 
     reset_board
   end
 end
 
-chess = Chessboard.new
-chess.knight_moves([0, 0], [7, 7]) 
+chessboard = Chessboard.new
+chessboard.knight_moves([0, 0], [7, 7]) 
