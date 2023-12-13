@@ -14,4 +14,4 @@ def bubble_sort(arr)
   end
 end
 
-p "lol"
+p bubble_sort([2, 1, 7, 5, 8, 9])
