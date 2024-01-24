@@ -117,6 +117,87 @@ describe Board do
 	end
 end
 
+describe WallE do
+
+	before (:each) do
+		allow_any_instance_of(Board).to receive(:prompt_what_size).and_return(9)
+		@board = Board.new
+	end
+
+	let(:human) { double('human', marker: 'X') }
+	subject(:walle) {WallE.new(@board, human)}
+
+	context 'Wall-E move set' do
+
+		it 'places marker randomly' do
+			walle.move
+			num_of_unmarked = @board.unmarked_keys.size
+
+			expect(num_of_unmarked).to be 8
+		end
+
+		it 'places marker randomly even when clear solution' do
+			@board[1] = human.marker
+			@board[2] = human.marker
+
+			walle.move
+			unmarked = @board.unmarked_keys
+			
+			expect(unmarked).to include(3)
+		end
+	end
+end
+
+describe Jarvis do
+
+	before (:each) do
+		allow_any_instance_of(Board).to receive(:prompt_what_size).and_return(9)
+		@board = Board.new
+	end
+
+	let(:human) { double('human', marker: 'X') }
+	subject(:jarvis) {Jarvis.new(@board, human)}
+
+	context 'Jarvis move set' do
+
+		it 'places marker correctly even when clear solution' do
+			@board[1] = human.marker
+			@board[2] = human.marker
+
+			jarvis.move
+			unmarked = @board.unmarked_keys
+			
+			expect(unmarked).not_to include(3)
+		end
+	end
+end
+
+describe ExMachina do
+
+	before (:each) do
+		allow_any_instance_of(Board).to receive(:prompt_what_size).and_return(9)
+		@board = Board.new
+	end
+
+	let(:human) { double('human', marker: 'X') }
+	subject(:exmachina) {ExMachina.new(@board, human)}
+
+	context 'ExMachina move set' do
+
+		it 'places marker correctly even when clear solution' do
+			@board[7] = human.marker
+			@board[3] = human.marker
+			@board[1] = exmachina.marker
+			@board[2] = exmachina.marker
+
+			exmachina.move
+			unmarked = @board.unmarked_keys
+			
+			expect(unmarked).not_to include(5)
+		end
+	end
+end
+
 
 
 
