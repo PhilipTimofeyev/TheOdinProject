@@ -532,7 +532,7 @@ class TTTGame
     display_goodbye_message
   end
 
-  private
+  # private
 
   def begin_io
     puts "\nPress any key start!"

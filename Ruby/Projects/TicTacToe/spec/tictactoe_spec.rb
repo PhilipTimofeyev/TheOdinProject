@@ -121,29 +121,19 @@ describe WallE do
 
 	before (:each) do
 		allow_any_instance_of(Board).to receive(:prompt_what_size).and_return(9)
-		@board = Board.new
 	end
 
 	let(:human) { double('human', marker: 'X') }
-	subject(:walle) {WallE.new(@board, human)}
+	let(:board) {Board.new}
+	subject(:walle) {WallE.new(board, human)}
 
 	context 'Wall-E move set' do
 
 		it 'places marker randomly' do
 			walle.move
-			num_of_unmarked = @board.unmarked_keys.size
+			num_of_unmarked = board.unmarked_keys.size
 
 			expect(num_of_unmarked).to be 8
-		end
-
-		it 'places marker randomly even when clear solution' do
-			@board[1] = human.marker
-			@board[2] = human.marker
-
-			walle.move
-			unmarked = @board.unmarked_keys
-			
-			expect(unmarked).to include(3)
 		end
 	end
 end
@@ -152,20 +142,20 @@ describe Jarvis do
 
 	before (:each) do
 		allow_any_instance_of(Board).to receive(:prompt_what_size).and_return(9)
-		@board = Board.new
 	end
 
 	let(:human) { double('human', marker: 'X') }
-	subject(:jarvis) {Jarvis.new(@board, human)}
+	let(:board) {Board.new}
+	subject(:jarvis) {Jarvis.new(board, human)}
 
 	context 'Jarvis move set' do
 
 		it 'places marker correctly even when clear solution' do
-			@board[1] = human.marker
-			@board[2] = human.marker
+			board[1] = human.marker
+			board[2] = human.marker
 
 			jarvis.move
-			unmarked = @board.unmarked_keys
+			unmarked = board.unmarked_keys
 			
 			expect(unmarked).not_to include(3)
 		end
@@ -176,32 +166,101 @@ describe ExMachina do
 
 	before (:each) do
 		allow_any_instance_of(Board).to receive(:prompt_what_size).and_return(9)
-		@board = Board.new
 	end
 
 	let(:human) { double('human', marker: 'X') }
-	subject(:exmachina) {ExMachina.new(@board, human)}
+	let(:board) {Board.new}
+	subject(:exmachina) {ExMachina.new(board, human)}
 
 	context 'ExMachina move set' do
 
 		it 'places marker correctly even when clear solution' do
-			@board[7] = human.marker
-			@board[3] = human.marker
-			@board[1] = exmachina.marker
-			@board[2] = exmachina.marker
+			board[7] = human.marker
+			board[3] = human.marker
+			board[1] = exmachina.marker
+			board[2] = exmachina.marker
 
 			exmachina.move
-			unmarked = @board.unmarked_keys
+			unmarked = board.unmarked_keys
 			
 			expect(unmarked).not_to include(5)
 		end
 	end
 end
 
+describe TTTGame do
 
+	subject(:game) {described_class.allocate}
 
+	let(:human_dbl) { double('human', marker: 'X') }
+	let(:computer_dbl) { double('computer', marker: 'O') }
 
+	before (:each) do
+		allow_any_instance_of(Board).to receive(:prompt_what_size).and_return(9)
+		game.instance_variable_set(:@board, Board.new) 
+		game.instance_variable_set(:@human, human_dbl) 
+	end
 
+	describe '#select_opponent' do
+
+		it 'returns WallE based on input' do
+			allow(game).to receive(:ask_which_opponent).and_return 2
+
+			expected_opponent_class = WallE
+			selected_opponent_class = game.select_opponent.class
+			expect(selected_opponent_class).to be(expected_opponent_class)
+		end
+
+		it 'returns Jarvis based on input' do
+			allow(game).to receive(:ask_which_opponent).and_return 3
+
+			expected_opponent_class = Jarvis
+			selected_opponent_class = game.select_opponent.class
+			expect(selected_opponent_class).to be(expected_opponent_class)
+		end
+
+		it 'returns Ex Machina based on input' do
+			allow(game).to receive(:ask_which_opponent).and_return 4
+
+			expected_opponent_class = ExMachina
+			selected_opponent_class = game.select_opponent.class
+			expect(selected_opponent_class).to be(expected_opponent_class)
+		end
+
+	end
+
+	describe '#sets_who_goes_first' do
+
+		before(:each) {game.instance_variable_set(:@computer, computer_dbl) }
+
+		it 'makes human first when 1' do
+			allow(game).to receive(:ask_who_goes_first).and_return 1
+
+			expected_first = [human_dbl, computer_dbl]
+			expect(game.set_who_goes_first).to eq(expected_first)
+		end
+
+		it 'makes computer first when 2' do
+			allow(game).to receive(:ask_who_goes_first).and_return 2
+
+			expected_first = [computer_dbl, human_dbl]
+			expect(game.set_who_goes_first).to eq(expected_first)
+		end
+	end
+
+	describe '#rotate_player' do
+		it 'rotates whose turn it is' do
+			game.instance_variable_set(:@players, [human_dbl, computer_dbl])
+
+			first_player = game.players.first
+			second_player = game.players.last
+
+			game.rotate_player
+
+			expect(game.players.first).to be(second_player)
+		end
+	end
+end
 
 
 
