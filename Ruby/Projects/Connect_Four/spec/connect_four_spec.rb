@@ -204,6 +204,19 @@ describe Board do
 
 			expect(board.winner?).to be false
 		end
+
+		example 'white and black cross' do
+			board.slots[1][0] = WhiteToken.new
+			board.slots[2][1] = WhiteToken.new
+			board.slots[3][2] = WhiteToken.new
+			board.slots[4][3] = BlackToken.new
+			board.slots[5][4] = WhiteToken.new
+			board.slots[2][5] = BlackToken.new
+			board.slots[3][4] = BlackToken.new
+			board.slots[5][2] = BlackToken.new
+
+			expect(board.winner?).to eq("⚫")
+		end
 	end
 end
 

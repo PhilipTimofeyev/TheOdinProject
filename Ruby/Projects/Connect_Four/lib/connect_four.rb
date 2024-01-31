@@ -73,18 +73,12 @@ class Board
 	end
 
 	def winner?
-		horizontal_winner || vertical_winner || diagonal_winner || diagonal_winner_transposed
+		horizontal_winner || vertical_winner || diagonal_winner
 
 	end
 
 	def horizontal_winner(board_slots = slots)
-		board_slots.each do |row|
-			row.each_cons(4) do |set|
-				return "⚪" if set.all? { |slot| slot.token == "⚪" if slot != EMPTY_SLOT }
-				return "⚫" if set.all? { |slot| slot.token == "⚫" if slot != EMPTY_SLOT }
-			end
-		end
-		false
+		check_slots_for_winner(board_slots)
 	end
 
 	def vertical_winner(board_slots = slots)
@@ -92,11 +86,11 @@ class Board
 		 horizontal_winner(transposed)
 	end
 
-	def diagonal_left_right_winner
+	def diagonal_winning_coords_top_half
 		starter = 0
 		row = 0
 		column = 0
-		result = []
+		coordinates = []
 
 		loop do
 			set = []
@@ -112,39 +106,42 @@ class Board
 				end
 			end
 
-			result << set
+			coordinates << set
 			set = []
 			starter += 1
 			column += 1
 			break if starter == 4
 		end	
 
-		result
+		coordinates
 	end
 
-	def diagonal_right_left_winner
-		diag_line = diagonal_left_right_winner.dup
+	def diagonal_winning_coords_bottom_half
+		diag_coords_top_half = diagonal_winning_coords_top_half
 
-		diag_line.each do |n| 
-			n.map! do |a| 
-				a.reverse
-			end
-		end
+		diag_coords_top_half.each do |set| 
+										set.map!(&:reverse)
+										end
 
-		diag_line[1..-1].each do |set|
+		diag_coords_top_half[1..-1].each do |set|
 			set.reject! {|row, column| row >= 6}
 		end
 	end
 
-	def diagonal_winner(board_slots = slots)
-		diag = diagonal_left_right_winner + diagonal_right_left_winner
+	def all_diagonal_winning_coords
+		 diagonal_winning_coords_top_half + diagonal_winning_coords_bottom_half
+	end
 
-		diag.each {|n| n}
-		diag.each do |set|
-			set.map! { |n| board_slots[n[0]][n[1]] }
+	def convert_diagonal_win_coords_to_slots(board_slots = slots)
+		coords = all_diagonal_winning_coords
+
+		coords.each do |set|
+			set.map! { |coord| board_slots[coord[0]][coord[1]] }
 		end
-		# p diag
-		diag.each do |row|
+	end
+
+	def check_slots_for_winner(slots_to_check)
+		slots_to_check.each do |row|
 			row.each_cons(4) do |set|
 				return "⚪" if set.all? { |slot| slot.token == "⚪" if slot != EMPTY_SLOT }
 				return "⚫" if set.all? { |slot| slot.token == "⚫" if slot != EMPTY_SLOT }
@@ -153,22 +150,21 @@ class Board
 		false
 	end
 
-	def diagonal_winner_transposed
-		diag = diagonal_left_right_winner + diagonal_right_left_winner
-		reversed_board = slots.map {|n| n.reverse}
+	def diagonal_winner_normal
+		slots_to_check = convert_diagonal_win_coords_to_slots
 
-		diag.each {|n| n}
-		diag.each do |set|
-			set.map! { |n| reversed_board[n[0]][n[1]] }
-		end
-		# p diag
-		diag.each do |row|
-			row.each_cons(4) do |set|
-				return "⚪" if set.all? { |slot| slot.token == "⚪" if slot != EMPTY_SLOT }
-				return "⚫" if set.all? { |slot| slot.token == "⚫" if slot != EMPTY_SLOT }
-			end
-		end
-		false
+		check_slots_for_winner(slots_to_check)
+	end
+
+	def diagonal_winner_mirrored
+		reversed_board = slots.map {|n| n.reverse}
+		slots_to_check = convert_diagonal_win_coords_to_slots(reversed_board)
+
+		check_slots_for_winner(slots_to_check)
+	end
+
+	def diagonal_winner
+		diagonal_winner_normal || diagonal_winner_mirrored
 	end
 
 end
@@ -188,10 +184,13 @@ board.slots[2][1] = WhiteToken.new
 board.slots[3][2] = WhiteToken.new
 board.slots[4][3] = BlackToken.new
 board.slots[5][4] = WhiteToken.new
+board.slots[2][5] = BlackToken.new
+board.slots[3][4] = BlackToken.new
+board.slots[5][2] = BlackToken.new
 
 
  board.draw_board
-p board.diagonal_left_right_winner
+# p board.diagonal_left_right_winner
 # x.diagonal_right_left_winner
 # p x.diagonal_winner
 # p x.diagonal_winner_transposed
