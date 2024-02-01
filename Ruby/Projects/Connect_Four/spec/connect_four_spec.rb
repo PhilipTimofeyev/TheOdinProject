@@ -240,3 +240,56 @@ describe 'Tokens' do
 		end
 	end
 end
+
+describe Player do
+	subject(:player) {described_class.new(board)}
+	let(:board) {Board.new}
+
+	before {board.create_slots}
+
+	describe 'can add token to board' do
+		it 'adds token to correct slot' do
+			selected_column = 4
+			player.add_token(selected_column)
+
+			correct_slot = board.slots[5][3].token
+
+			expect(correct_slot).to eq("⚪")
+		end
+	end
+
+	describe 'player input only accepts 1-7' do
+		it 'returns true on valid entry' do
+			sample_entry = '4'
+			expect(player.valid_entry?(sample_entry)).to be true
+		end
+
+		it 'raises an invalid entry error if not valid' do
+			sample_entry = '12'
+			output = "Invalid entry\n"
+			expect { player.valid_entry?(sample_entry) }.to output(output).to_stdout
+		end
+
+		it 'raises an invalid entry error if entry is made of letters' do
+			sample_entry = 'dog'
+			output = "Invalid entry\n"
+			expect { player.valid_entry?(sample_entry) }.to output(output).to_stdout
+		end
+
+		it 'raises an invalid entry error if entry is punctuation' do
+			sample_entry = '../.'
+			output = "Invalid entry\n"
+			expect { player.valid_entry?(sample_entry) }.to output(output).to_stdout
+		end
+
+	end
+
+end
+
+
+
+
+
+
+
+

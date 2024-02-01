@@ -8,7 +8,6 @@ class WhiteToken
 	def to_s
 		token
 	end
-
 end
 
 class BlackToken
@@ -21,10 +20,48 @@ class BlackToken
 	def to_s
 		token
 	end
-
 end
 
+class Player
+	attr_accessor :token, :board
 
+	def initialize(board)
+		@token = WhiteToken.new
+		@board = board
+	end
+
+	def add_token(column)
+		board[column - 1] = token
+	end
+
+	def valid_entry?(entry)
+	  if entry.to_i.between?(1, 7)
+	  	true
+	  else
+	 		puts "Invalid entry"
+	 		false
+	 	end
+	end
+
+	def retrieve_input
+		input = nil
+
+		loop do
+			puts "Please enter a number between 1 and 7"
+			input = gets.chomp
+			break if valid_entry?(input)
+		end
+
+		input.to_i
+	end
+
+	def player_move
+		column = retrieve_input
+		add_token(column)
+	end
+
+
+end
 
 class Board
 	EMPTY_SLOT = '__'
@@ -46,7 +83,10 @@ class Board
 	end
 
 	def draw_board
+		puts "  C O N N E C T   F O U R"
 		puts "_" * 30
+		puts "  1   2   3   4   5   6   7" 
+		puts "―" * 30
 		slots.each do |row| 
 			puts " "
 			puts "‖ " + row.join("  ") + " ‖"
@@ -172,33 +212,10 @@ end
 
 
  board = Board.new
- board.create_slots
- # x.draw_board
-# x.slots[2][0] = WhiteToken.new
-# x.slots[3][1] = WhiteToken.new
-# x.slots[4][2] = WhiteToken.new
-# x.slots[5][3] = WhiteToken.new
+ player = Player.new(board)
 
-board.slots[1][0] = WhiteToken.new
-board.slots[2][1] = WhiteToken.new
-board.slots[3][2] = WhiteToken.new
-board.slots[4][3] = BlackToken.new
-board.slots[5][4] = WhiteToken.new
-board.slots[2][5] = BlackToken.new
-board.slots[3][4] = BlackToken.new
-board.slots[5][2] = BlackToken.new
+ # player.retrieve_input
+ # board.create_slots
+ # board.draw_board
 
 
- board.draw_board
-# p board.diagonal_left_right_winner
-# x.diagonal_right_left_winner
-# p x.diagonal_winner
-# p x.diagonal_winner_transposed
- p board.winner?
-
-# p x.vertical_winner
-# x.draw_board
-
-
-# x = [1, 1, 1, 2]
-# p x.all? {|n| n == 1 || n == 2}
