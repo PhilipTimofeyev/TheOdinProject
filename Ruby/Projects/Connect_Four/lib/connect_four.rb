@@ -1,32 +1,40 @@
+require 'io/console'
+
+module Displayable
+  def clear
+    Gem.win_platform? ? (system "cls") : (system "clear")
+  end
+ end
+
 class WhiteToken
-	attr_reader :token
+	attr_reader :color
 
 	def initialize
-		@token = "⚪"
+		@color = "⚪"
 	end
 
 	def to_s
-		token
+		color
 	end
 end
 
 class BlackToken
-	attr_reader :token
+	attr_reader :color
 
 	def initialize
-		@token = "⚫"
+		@color = "⚫"
 	end
 
 	def to_s
-		token
+		color
 	end
 end
 
 class Player
-	attr_accessor :token, :board
+	attr_accessor :token, :board, :player_name
 
 	def initialize(board)
-		@token = WhiteToken.new
+		@token = token
 		@board = board
 	end
 
@@ -43,11 +51,32 @@ class Player
 	 	end
 	end
 
+	def set_token
+		puts "Please select a token.\n Enter 1 for white ⚪ and 2 for black ⚫"
+
+		input = nil
+
+		loop do
+			input = gets.chomp
+
+			break if input.to_i.between?(1, 2)
+			puts "Not a valid entry."
+		end
+
+		self.token = input.to_i == 1 ? WhiteToken.new : BlackToken.new
+	end
+
+	def set_player_name
+		puts "Please enter a name for player"
+
+		self.player_name = gets.chomp
+	end
+
 	def retrieve_input
 		input = nil
 
 		loop do
-			puts "Please enter a number between 1 and 7"
+			puts "#{player_name} please enter a number between 1 and 7"
 			input = gets.chomp
 			break if valid_entry?(input)
 		end
@@ -55,16 +84,17 @@ class Player
 		input.to_i
 	end
 
-	def player_move
+	def move
 		column = retrieve_input
 		add_token(column)
 	end
-
-
 end
+
 
 class Board
 	EMPTY_SLOT = '__'
+	include Displayable
+
 	attr_accessor :slots
 
 	def initialize
@@ -83,6 +113,7 @@ class Board
 	end
 
 	def draw_board
+		clear
 		puts "  C O N N E C T   F O U R"
 		puts "_" * 30
 		puts "  1   2   3   4   5   6   7" 
@@ -114,7 +145,6 @@ class Board
 
 	def winner?
 		horizontal_winner || vertical_winner || diagonal_winner
-
 	end
 
 	def horizontal_winner(board_slots = slots)
@@ -183,8 +213,8 @@ class Board
 	def check_slots_for_winner(slots_to_check)
 		slots_to_check.each do |row|
 			row.each_cons(4) do |set|
-				return "⚪" if set.all? { |slot| slot.token == "⚪" if slot != EMPTY_SLOT }
-				return "⚫" if set.all? { |slot| slot.token == "⚫" if slot != EMPTY_SLOT }
+				return "⚪" if set.all? { |slot| slot.color == "⚪" if slot != EMPTY_SLOT }
+				return "⚫" if set.all? { |slot| slot.color == "⚫" if slot != EMPTY_SLOT }
 			end
 		end
 		false
@@ -209,13 +239,103 @@ class Board
 
 end
 
+class ConnectFour
+	include Displayable
+
+	attr_accessor :board, :player_one, :player_two, :players
+
+	def initialize
+		@board = Board.new
+		board.create_slots
+		@player_one = Player.new(board)
+		@player_two = Player.new(board)
+		@players = [player_one, player_two]
+	end
+
+	def game_loop
+		welcome_message
+		begin_io
+
+		loop do
+			set_starting_conditions
+			loop do
+				current_player.move
+				board.draw_board
+				break if board.winner?
+				rotate_player
+			end
+			reveal_winner
+			sleep 2
+			break unless play_again?
+			board.reset_board
+		end
+		quit_message
+	end
+
+	def set_starting_conditions
+		board.draw_board
+		player_one.set_player_name
+		player_one.set_token
+		board.draw_board
+		player_two.set_player_name
+		player_two_set_token
+	end
+
+	def quit_message
+		puts "Thanks for playing!"
+	end
+
+	def current_player
+	  players.first
+	end
+
+	def play_again?
+		puts "Play again? Enter 1 to play again or any other key to quit."
+
+		input = nil
+
+		loop do
+			input = gets.chomp.to_i
+			break if input.between?(1, 2)
+		end
+
+		input == 1
+	end
+
+	def rotate_player
+	  players.rotate!
+	end
+
+	def determine_winner
+		board.winner? == player_one.token.color ? player_one : player_two
+	end
+
+	def reveal_winner
+		winner = determine_winner
+
+		puts "#{winner.player_name} won!"
+	end
+
+	def welcome_message
+		clear
+		puts "Welcome to Connect Four!"
+	end
+
+	def player_two_set_token
+		player_two.token = player_one.token.color == "⚪" ?  BlackToken.new : WhiteToken.new
+	end
+
+	def begin_io
+	  puts "\nPress any key start"
+	  $stdin.getch
+	  clear
+	end
 
 
- board = Board.new
- player = Player.new(board)
 
- # player.retrieve_input
- # board.create_slots
- # board.draw_board
+end
+
+game = ConnectFour.new
+game.game_loop
 
 

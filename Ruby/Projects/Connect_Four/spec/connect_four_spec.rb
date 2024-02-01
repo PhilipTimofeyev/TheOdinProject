@@ -72,7 +72,7 @@ describe Board do
 			board[selected_column] = white_token
 			correct_slot = board.slots[5][5]
 
-			expect(correct_slot.token).to eq("⚪")
+			expect(correct_slot.color).to eq("⚪")
 		end
 
 		it 'adds correct token to specified slot when column not empty' do
@@ -88,7 +88,7 @@ describe Board do
 			board[selected_column] = white_token
 			correct_slot = board.slots[3][4]
 
-			expect(correct_slot.token).to eq("⚪")
+			expect(correct_slot.color).to eq("⚪")
 		end
 	end
 
@@ -250,9 +250,10 @@ describe Player do
 	describe 'can add token to board' do
 		it 'adds token to correct slot' do
 			selected_column = 4
+			player.token = WhiteToken.new
 			player.add_token(selected_column)
 
-			correct_slot = board.slots[5][3].token
+			correct_slot = board.slots[5][3].color
 
 			expect(correct_slot).to eq("⚪")
 		end
@@ -282,6 +283,22 @@ describe Player do
 			expect { player.valid_entry?(sample_entry) }.to output(output).to_stdout
 		end
 
+	end
+
+end
+
+describe ConnectFour do
+	subject(:game) {described_class.new}
+	# let(:player_one) {double('player_one', token: WhiteToken.new) }
+
+	describe 'reveals correct winner' do
+		it 'is black when black' do
+			allow(game.board).to receive(:winner?).and_return("⚪")
+
+			game.player_one.token = WhiteToken.new
+
+			expect(game.determine_winner).to eq(game.player_one)
+		end
 	end
 
 end
