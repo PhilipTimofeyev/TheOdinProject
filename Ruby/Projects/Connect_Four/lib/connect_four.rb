@@ -57,9 +57,9 @@ class Player
 		input = nil
 
 		loop do
-			input = gets.chomp
+			input = gets.chomp.to_i
 
-			break if input.to_i.between?(1, 2)
+			break if input.between?(1, 2)
 			puts "Not a valid entry."
 		end
 
@@ -75,10 +75,14 @@ class Player
 	def retrieve_input
 		input = nil
 
+		puts "#{player_name} Please enter a column"
 		loop do
-			puts "#{player_name} please enter a number between 1 and 7"
-			input = gets.chomp
-			break if valid_entry?(input)
+			input = gets.chomp.to_i
+			break if valid_entry?(input) && !board.column_full?(input)
+
+			if board.column_full?(input)
+				puts "Column is full. Enter a different column."
+			end
 		end
 
 		input.to_i
@@ -141,6 +145,14 @@ class Board
 	def reset_board
 		@slots = []
 		create_slots
+	end
+
+	def column_full?(column)
+		slots[0][column - 1] != EMPTY_SLOT
+	end
+
+	def full?
+		slots[0].none? {|slot| slot == EMPTY_SLOT}
 	end
 
 	def winner?
@@ -261,7 +273,7 @@ class ConnectFour
 			loop do
 				current_player.move
 				board.draw_board
-				break if board.winner?
+				break if board.winner? || board.full?
 				rotate_player
 			end
 			reveal_winner
@@ -292,13 +304,7 @@ class ConnectFour
 	def play_again?
 		puts "Play again? Enter 1 to play again or any other key to quit."
 
-		input = nil
-
-		loop do
-			input = gets.chomp.to_i
-			break if input.between?(1, 2)
-		end
-
+		input = gets.chomp.to_i
 		input == 1
 	end
 
@@ -312,8 +318,11 @@ class ConnectFour
 
 	def reveal_winner
 		winner = determine_winner
-
-		puts "#{winner.player_name} won!"
+		if board.full?
+			puts "Draw!"
+		else
+			puts "#{winner.player_name} is the winner!"
+		end
 	end
 
 	def welcome_message
@@ -330,8 +339,6 @@ class ConnectFour
 	  $stdin.getch
 	  clear
 	end
-
-
 
 end
 

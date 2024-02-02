@@ -218,6 +218,24 @@ describe Board do
 			expect(board.winner?).to eq("⚫")
 		end
 	end
+
+	describe 'no more empty slots' do
+
+		example 'column is full' do
+			board.slots[0][0] = WhiteToken.new
+			column_selected = 1
+
+			expect(board.column_full?(column_selected)).to be true
+		end
+
+		example 'board is full' do
+			board.slots.each do |set|
+				set.map! {|slot| slot = WhiteToken.new}
+			end
+			
+			expect(board.full?).to be true
+		end
+	end
 end
 
 
@@ -289,7 +307,6 @@ end
 
 describe ConnectFour do
 	subject(:game) {described_class.new}
-	# let(:player_one) {double('player_one', token: WhiteToken.new) }
 
 	describe 'reveals correct winner' do
 		it 'is black when black' do
