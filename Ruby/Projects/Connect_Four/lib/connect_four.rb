@@ -128,7 +128,7 @@ class Board
     puts "―" * 30
     slots.each do |row|
       puts " "
-      puts "‖ " + row.join("  ") + " ‖"
+      puts "‖ #{row.join('  ')} ‖"
     end
     puts "―" * 30
   end
@@ -247,7 +247,7 @@ class Board
   end
 
   def diagonal_winner_mirrored
-    reversed_board = slots.map { |n| n.reverse }
+    reversed_board = slots.map(&:reverse)
     slots_to_check = convert_diagonal_win_coords_to_slots(reversed_board)
 
     check_slots_for_winner(slots_to_check)
@@ -271,7 +271,7 @@ class ConnectFour
     @players = [player_one, player_two]
   end
 
-  def game_loop
+  def play
     welcome_message
     begin_io
 
@@ -349,5 +349,5 @@ class ConnectFour
   end
 end
 
-# game = ConnectFour.new
-# game.game_loop
+game = ConnectFour.new
+game.play
