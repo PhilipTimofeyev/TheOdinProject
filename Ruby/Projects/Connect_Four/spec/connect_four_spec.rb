@@ -232,7 +232,7 @@ describe Board do
 			board.slots.each do |set|
 				set.map! {|slot| slot = WhiteToken.new}
 			end
-			
+
 			expect(board.full?).to be true
 		end
 	end
@@ -308,7 +308,7 @@ end
 describe ConnectFour do
 	subject(:game) {described_class.new}
 
-	describe 'reveals correct winner' do
+	describe 'determines correct winner' do
 		it 'is black when black' do
 			allow(game.board).to receive(:winner?).and_return("⚪")
 
